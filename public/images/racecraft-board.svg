@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" role="img" aria-labelledby="title desc">
+  <title id="title">赛车战术板原创示意图</title>
+  <desc id="desc">一张不含官方标识的观赛知识库示意图，展示赛道、轮胎、计时和策略线索。</desc>
+  <rect width="920" height="620" fill="#f7f8fb"/>
+  <rect x="42" y="44" width="836" height="532" rx="22" fill="#ffffff" stroke="#d7dce6" stroke-width="2"/>
+  <path d="M162 395 C84 308 118 163 258 141 C375 123 392 244 489 238 C605 231 592 100 721 131 C847 162 812 328 715 354 C608 382 554 304 469 349 C385 394 297 545 162 395Z" fill="none" stroke="#14213d" stroke-width="34" stroke-linecap="round"/>
+  <path d="M162 395 C84 308 118 163 258 141 C375 123 392 244 489 238 C605 231 592 100 721 131 C847 162 812 328 715 354 C608 382 554 304 469 349 C385 394 297 545 162 395Z" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-dasharray="20 24"/>
+  <circle cx="725" cy="132" r="18" fill="#c7433f"/>
+  <circle cx="162" cy="395" r="18" fill="#2f7d6d"/>
+  <path d="M474 350 C546 331 604 356 664 404" fill="none" stroke="#c7433f" stroke-width="8" stroke-linecap="round"/>
+  <path d="M505 239 C562 219 601 186 621 133" fill="none" stroke="#2f7d6d" stroke-width="8" stroke-linecap="round"/>
+  <rect x="112" y="74" width="215" height="72" rx="10" fill="#14213d"/>
+  <text x="132" y="111" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="700">RACECRAFT</text>
+  <text x="132" y="132" fill="#d7dce6" font-family="Arial, sans-serif" font-size="13">strategy · tyres · corners</text>
+  <g font-family="Arial, sans-serif" font-size="16" fill="#132238">
+    <text x="690" y="93">DRS / 尾流</text>
+    <text x="110" y="438">刹车区</text>
+    <text x="627" y="436">出弯速度</text>
+    <text x="286" y="520">进站窗口</text>
+  </g>
+  <g fill="#b4832f">
+    <rect x="686" y="506" width="48" height="18" rx="9"/>
+    <rect x="746" y="506" width="48" height="18" rx="9"/>
+    <rect x="806" y="506" width="48" height="18" rx="9"/>
+  </g>
+  <g fill="#132238" opacity="0.18">
+    <circle cx="723" cy="515" r="4"/>
+    <circle cx="783" cy="515" r="4"/>
+    <circle cx="843" cy="515" r="4"/>
+  </g>
+</svg>
