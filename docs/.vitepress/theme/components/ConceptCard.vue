@@ -11,7 +11,9 @@ const props = defineProps<{
 
 const resolvedLink = computed(() => {
   if (!props.link) return undefined
-  return props.link.startsWith('/') ? withBase(props.link) : props.link
+  if (!props.link.startsWith('/')) return props.link
+  if (props.link.endsWith('/') || props.link.endsWith('.html')) return withBase(props.link)
+  return withBase(`${props.link}.html`)
 })
 </script>
 

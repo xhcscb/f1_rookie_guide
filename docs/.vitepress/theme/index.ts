@@ -8,6 +8,7 @@ import LearningPath from './components/LearningPath.vue'
 import ResourceCard from './components/ResourceCard.vue'
 import TermBadge from './components/TermBadge.vue'
 import TrackCornerCard from './components/TrackCornerCard.vue'
+import TrackGallery from './components/TrackGallery.vue'
 import TrackMap from './components/TrackMap.vue'
 
 export default {
@@ -19,6 +20,7 @@ export default {
     app.component('ResourceCard', ResourceCard)
     app.component('TermBadge', TermBadge)
     app.component('TrackCornerCard', TrackCornerCard)
+    app.component('TrackGallery', TrackGallery)
     app.component('TrackMap', TrackMap)
   }
 } satisfies Theme

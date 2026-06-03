@@ -9,7 +9,9 @@ const props = defineProps<{
 
 const resolvedHref = computed(() => {
   if (!props.href) return undefined
-  return props.href.startsWith('/') ? withBase(props.href) : props.href
+  if (!props.href.startsWith('/')) return props.href
+  if (props.href.endsWith('/') || props.href.endsWith('.html')) return withBase(props.href)
+  return withBase(`${props.href}.html`)
 })
 </script>
 

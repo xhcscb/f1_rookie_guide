@@ -14,7 +14,7 @@ export default defineConfig({
   title: siteTitle,
   description: siteDescription,
   lang: 'zh-CN',
-  cleanUrls: true,
+  cleanUrls: false,
   lastUpdated: true,
   base,
   head: [
@@ -107,12 +107,30 @@ export default defineConfig({
           text: '赛道图鉴',
           items: [
             { text: '栏目首页', link: '/tracks/' },
+            { text: '巴林', link: '/tracks/bahrain' },
+            { text: '吉达', link: '/tracks/jeddah' },
+            { text: '墨尔本', link: '/tracks/melbourne' },
             { text: '上海', link: '/tracks/shanghai' },
-            { text: '摩纳哥', link: '/tracks/monaco' },
-            { text: '蒙扎', link: '/tracks/monza' },
             { text: '铃鹿', link: '/tracks/suzuka' },
+            { text: '迈阿密', link: '/tracks/miami' },
+            { text: '伊莫拉', link: '/tracks/imola' },
+            { text: '摩纳哥', link: '/tracks/monaco' },
+            { text: '巴塞罗那', link: '/tracks/barcelona' },
+            { text: '蒙特利尔', link: '/tracks/montreal' },
+            { text: '红牛环', link: '/tracks/red-bull-ring' },
+            { text: '银石', link: '/tracks/silverstone' },
             { text: '斯帕', link: '/tracks/spa' },
-            { text: '银石', link: '/tracks/silverstone' }
+            { text: '匈牙利', link: '/tracks/hungaroring' },
+            { text: '赞德福特', link: '/tracks/zandvoort' },
+            { text: '蒙扎', link: '/tracks/monza' },
+            { text: '巴库', link: '/tracks/baku' },
+            { text: '新加坡', link: '/tracks/singapore' },
+            { text: '美洲赛道', link: '/tracks/cota' },
+            { text: '墨西哥城', link: '/tracks/mexico-city' },
+            { text: '英特拉格斯', link: '/tracks/interlagos' },
+            { text: '拉斯维加斯', link: '/tracks/las-vegas' },
+            { text: '卢塞尔', link: '/tracks/lusail' },
+            { text: '阿布扎比', link: '/tracks/abu-dhabi' }
           ]
         }
       ],
