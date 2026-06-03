@@ -1,5 +1,7 @@
 # 银石
 
+<TrackMap track="silverstone" />
+
 ## 一句话特点
 
 银石以高速弯群和流畅节奏著称，是观察赛车高速下压力、脏空气和车手信心的好赛道。
@@ -51,4 +53,3 @@
 <TermBadge term="脏空气" href="/strategy/dirty-air" />
 <TermBadge term="出弯速度" href="/racecraft/exit-speed" />
 <TermBadge term="赛道限制" href="/rules/track-limits" />
-

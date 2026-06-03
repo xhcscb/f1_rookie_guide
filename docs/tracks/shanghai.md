@@ -1,5 +1,7 @@
 # 上海国际赛车场
 
+<TrackMap track="shanghai" />
+
 ## 一句话特点
 
 上海是一条兼具长直道、重刹车和长半径弯的赛道，新手可以重点看 T1-T4 轮胎负荷和 T14 超车。
@@ -51,4 +53,3 @@
 <TermBadge term="出弯速度" href="/racecraft/exit-speed" />
 <TermBadge term="DRS" href="/rules/drs-overtake-mode" />
 <TermBadge term="轮胎衰退" href="/strategy/tyre-degradation" />
-

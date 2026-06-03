@@ -1,5 +1,7 @@
 # 蒙扎
 
+<TrackMap track="monza" />
+
 ## 一句话特点
 
 蒙扎是高速、低下压力和重刹车的代表，尾流、DRS 和刹车区执行非常关键。
@@ -51,4 +53,3 @@
 <TermBadge term="尾流" href="/strategy/dirty-air" />
 <TermBadge term="DRS Train" href="/strategy/drs-train" />
 <TermBadge term="刹车点" href="/racecraft/braking-point" />
-

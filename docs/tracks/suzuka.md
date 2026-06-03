@@ -1,5 +1,7 @@
 # 铃鹿
 
+<TrackMap track="suzuka" />
+
 ## 一句话特点
 
 铃鹿是一条流畅、节奏强、考验高速稳定性的赛道，S 弯和 130R 是理解赛车平衡的好入口。
@@ -51,4 +53,3 @@
 <TermBadge term="脏空气" href="/strategy/dirty-air" />
 <TermBadge term="赛车线" href="/racecraft/racing-line" />
 <TermBadge term="出弯速度" href="/racecraft/exit-speed" />
-

@@ -1,5 +1,7 @@
 # 摩纳哥
 
+<TrackMap track="monaco" />
+
 ## 一句话特点
 
 摩纳哥是窄街道、低速弯和护墙压力的代表，排位极其重要，正赛超车非常困难。
@@ -51,4 +53,3 @@
 <TermBadge term="排位赛" href="/guide/qualifying" />
 <TermBadge term="进站窗口" href="/strategy/pit-window" />
 <TermBadge term="Overcut" href="/strategy/overcut" />
-

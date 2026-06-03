@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 const steps = [
   { title: '比赛周末怎么看', href: '/guide/weekend-format' },
   { title: '排位赛怎么看', href: '/guide/qualifying' },
@@ -14,7 +16,7 @@ const steps = [
   <section class="learning-path" aria-label="新手学习路径">
     <ol>
       <li v-for="step in steps" :key="step.href">
-        <a :href="step.href">{{ step.title }}</a>
+        <a :href="withBase(step.href)">{{ step.title }}</a>
       </li>
     </ol>
   </section>

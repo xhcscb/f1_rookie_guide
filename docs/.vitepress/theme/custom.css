@@ -598,6 +598,344 @@ a.term-badge:hover {
   line-height: 1.65;
 }
 
+.race-app {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  color: #f4f1ed;
+  background: #08090c;
+}
+
+.race-app :where(h1, h2, h3, p) {
+  letter-spacing: 0;
+}
+
+.race-hero,
+.race-panel,
+.app-link-card {
+  border: 1px solid rgba(180, 24, 32, 0.36);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(16, 18, 24, 0.98), rgba(32, 10, 13, 0.96)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 30px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+}
+
+.race-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(360px, 1fr);
+  gap: 26px;
+  align-items: center;
+  padding: 30px;
+}
+
+.race-kicker,
+.panel-title span {
+  display: inline-flex;
+  color: #ff4b55;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.race-hero h1 {
+  margin: 8px 0 10px;
+  color: #fff7f2;
+  font-size: 3.4rem;
+  line-height: 1.02;
+}
+
+.race-hero p,
+.track-copy p,
+.verdict p {
+  color: #c8bcb7;
+  line-height: 1.65;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.hero-actions a,
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border-radius: 5px;
+  padding: 0 13px;
+  background: #9e111b;
+  color: #fff;
+  font-weight: 850;
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28);
+}
+
+.hero-actions a:nth-child(2) {
+  background: #6f0d14;
+}
+
+.hero-actions a:nth-child(3) {
+  background: #2b2f38;
+}
+
+.race-panel {
+  margin-top: 22px;
+  padding: 22px;
+}
+
+.panel-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel-title h2 {
+  margin: 0;
+  color: #fff7f2;
+  font-size: 1.45rem;
+}
+
+.desk-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+}
+
+.desk-controls label,
+.slider-list label {
+  display: grid;
+  gap: 7px;
+  color: #efe5df;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.desk-controls select,
+.term-input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(255, 75, 85, 0.38);
+  border-radius: 5px;
+  padding: 0 11px;
+  background: #11141a;
+  color: #fff7f2;
+  font: inherit;
+}
+
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.focus-grid strong {
+  border-left: 3px solid #ff2f3c;
+  border-radius: 5px;
+  padding: 13px;
+  background: rgba(255, 47, 60, 0.1);
+  color: #fff7f2;
+}
+
+.race-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+}
+
+.track-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.track-tabs button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 75, 85, 0.35);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: #11141a;
+  color: #d6c9c2;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.track-tabs button.active {
+  background: #a40f1b;
+  color: #fff;
+}
+
+.track-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.track-copy b {
+  color: #ff4b55;
+}
+
+.track-copy ul {
+  display: grid;
+  gap: 9px;
+  padding-left: 20px;
+  color: #e4d8d1;
+}
+
+.track-map {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.72fr);
+  gap: 14px;
+  align-items: center;
+  border: 1px solid rgba(255, 75, 85, 0.32);
+  border-radius: 8px;
+  padding: 14px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 26px),
+    #0d1016;
+}
+
+.track-map svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.track-map__shadow {
+  fill: none;
+  stroke: rgba(255, 34, 48, 0.28);
+  stroke-width: 28;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track-map__line {
+  fill: none;
+  stroke: #f3eee9;
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track-map__dot {
+  fill: #ff2f3c;
+  stroke: #fff7f2;
+  stroke-width: 2;
+}
+
+.track-map text {
+  fill: #fff7f2;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.track-map__legend strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #fff7f2;
+}
+
+.track-map__legend p {
+  margin: 0 0 9px;
+  color: #cfc2bb;
+  line-height: 1.45;
+}
+
+.track-map__legend span {
+  display: inline-flex;
+  min-width: 54px;
+  margin-right: 7px;
+  color: #ff4b55;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 900;
+}
+
+.slider-list {
+  display: grid;
+  gap: 14px;
+}
+
+.slider-list input {
+  accent-color: #d91425;
+}
+
+.verdict {
+  margin-top: 16px;
+  border-radius: 6px;
+  padding: 14px;
+  background: #050608;
+}
+
+.verdict span {
+  color: #ff4b55;
+  font-size: 1.8rem;
+  font-weight: 950;
+}
+
+.term-input {
+  margin-bottom: 14px;
+}
+
+.term-list {
+  display: grid;
+  gap: 9px;
+  max-height: 410px;
+  overflow: auto;
+}
+
+.term-list a {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(255, 75, 85, 0.22);
+  border-radius: 6px;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  text-decoration: none;
+}
+
+.term-list strong {
+  color: #fff7f2;
+}
+
+.term-list span {
+  color: #c8bcb7;
+}
+
+.app-card-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.app-link-card {
+  min-height: 112px;
+  padding: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-link-card strong {
+  color: #fff7f2;
+}
+
+.app-link-card p {
+  margin: 8px 0 0;
+  color: #bcaeaa;
+}
+
 @media (max-width: 760px) {
   .race-app {
     padding: 18px 14px 42px;
@@ -607,11 +945,20 @@ a.term-badge:hover {
     font-size: 2.3rem;
   }
 
+  .race-hero h1 {
+    font-size: 2.45rem;
+  }
+
   .app-hero,
+  .race-hero,
   .desk-controls,
   .desk-grid,
   .track-console,
+  .track-grid,
+  .track-map,
   .app-split,
+  .race-split,
+  .focus-grid,
   .app-card-grid {
     grid-template-columns: 1fr;
   }

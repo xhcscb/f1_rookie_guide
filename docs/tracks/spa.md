@@ -1,5 +1,7 @@
 # 斯帕
 
+<TrackMap track="spa" />
+
 ## 一句话特点
 
 斯帕是一条长圈、海拔变化和高速组合明显的经典赛道，天气、尾流和下压力取舍都会影响比赛。
@@ -51,4 +53,3 @@
 <TermBadge term="尾流" href="/strategy/dirty-air" />
 <TermBadge term="DRS" href="/rules/drs-overtake-mode" />
 <TermBadge term="刹车点" href="/racecraft/braking-point" />
-

@@ -1,206 +1,187 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { withBase } from 'vitepress'
+import TrackMap from './TrackMap.vue'
+
+type TrackId = 'shanghai' | 'monaco' | 'monza' | 'suzuka' | 'spa' | 'silverstone'
 
 const tracks = [
   {
     id: 'shanghai',
     name: '上海',
     fullName: '上海国际赛车场',
-    type: '长直道 + 长弯 + 重刹车',
-    overtake: '中等',
-    tyre: '中',
-    drs: '强',
-    summary: '重点看 T13 出弯到 T14 重刹车：后车能否贴住、DRS 是否足够、刹车区能否完成动作。',
-    corners: ['T1-T2 长半径减速弯：看前胎是否推头', 'T13 长直道前出口：看出弯速度', 'T14 重刹车点：看内线攻防和锁死风险'],
+    tag: '长直道 / T14 重刹',
+    summary: '看 T13 出口。能贴住，T14 才有戏。',
+    corners: ['T1-T2：长弯，前胎容易苦。', 'T13：出口速度决定直道攻击。', 'T14：重刹点，最像超车窗口。'],
     link: '/tracks/shanghai'
   },
   {
     id: 'monaco',
     name: '摩纳哥',
     fullName: '摩纳哥',
-    type: '窄街道 + 低速弯 + 护墙',
-    overtake: '困难',
-    tyre: '低',
-    drs: '弱',
-    summary: '排位价值极高，正赛更多看发车、进站窗口和安全车，而不是期待大量赛道超车。',
-    corners: ['T1 Sainte Devote：看发车拥挤', 'Loews 发夹弯：看低速牵引', '隧道后减速弯：少数攻击窗口'],
+    tag: '窄街道 / 排位为王',
+    summary: '别等大超车。看排位、发车、进站窗口。',
+    corners: ['T1：发车后最乱。', 'Hairpin：慢到极致，看机械抓地。', '隧道后：少数能动手的位置。'],
     link: '/tracks/monaco'
   },
   {
     id: 'monza',
     name: '蒙扎',
     fullName: '蒙扎',
-    type: '高速 + 低下压力 + 重刹车',
-    overtake: '容易',
-    tyre: '中',
-    drs: '强',
-    summary: '适合学习尾流和 DRS，但形成 DRS Train 后，大家都有尾翼优势，超车反而会卡住。',
-    corners: ['T1 Rettifilo：长直道后重刹车', 'Roggia：第二次刹车进攻', 'Parabolica：为下一圈 T1 准备尾流'],
+    tag: '低阻 / 尾流 / 重刹',
+    summary: '直道很长，但 DRS Train 会把攻击锁住。',
+    corners: ['T1：大直道后硬刹。', 'Roggia：第二次动手机会。', 'Parabolica：出口决定下一圈。'],
     link: '/tracks/monza'
   },
   {
     id: 'suzuka',
     name: '铃鹿',
     fullName: '铃鹿',
-    type: '高速连续弯 + 节奏赛道',
-    overtake: '中等',
-    tyre: '高',
-    drs: '中',
-    summary: '核心是节奏。后车在高速弯跟车会吃脏空气，想进攻必须先在 Spoon 出弯前做好准备。',
-    corners: ['S 弯：看连续换向', 'Spoon：看出口准备', '130R：看高速稳定和脏空气'],
+    tag: '节奏 / 高速连续弯',
+    summary: '看 S 弯节奏。跟太近会被脏空气拖住。',
+    corners: ['S 弯：一错连错。', 'Spoon：出口接长加速。', '130R：高速信心测试。'],
     link: '/tracks/suzuka'
   },
   {
     id: 'spa',
     name: '斯帕',
     fullName: '斯帕',
-    type: '长圈 + 海拔变化 + 高速',
-    overtake: '容易',
-    tyre: '中',
-    drs: '强',
-    summary: '适合观察下压力取舍：直道快不等于全圈舒服，高速弯稳定和天气变量同样会改写比赛。',
-    corners: ['La Source：发车和重启', 'Eau Rouge/Raidillon：高速上坡', 'Les Combes：Kemmel 直道后的主要超车点'],
+    tag: '长圈 / 高速 / 天气',
+    summary: '尾流、下压力、天气，三件事一起看。',
+    corners: ['La Source：发车和重启。', 'Raidillon：带出 Kemmel 尾流。', 'Les Combes：主要超车点。'],
     link: '/tracks/spa'
   },
   {
     id: 'silverstone',
     name: '银石',
     fullName: '银石',
-    type: '高速弯群 + 长直道',
-    overtake: '中等',
-    tyre: '高',
-    drs: '中',
-    summary: '高速下压力和脏空气样本。很多 Stowe 攻击，从 Chapel 出弯就已经开始。',
-    corners: ['Maggotts-Becketts：高速换向', 'Chapel：直道前出口', 'Stowe：尾流后的刹车区攻防'],
+    tag: '高速下压力 / 脏空气',
+    summary: '看 Chapel 出口。Stowe 的超车从那里开始。',
+    corners: ['Maggotts-Becketts：高速换向。', 'Chapel：直道前出口。', 'Stowe：尾流后刹车区。'],
     link: '/tracks/silverstone'
   }
-]
+] satisfies Array<{ id: TrackId; name: string; fullName: string; tag: string; summary: string; corners: string[]; link: string }>
 
 const phases = [
-  { name: '发车与第一圈', focus: ['看前排是否守住内线', '看中游是否大幅升降', '看是否触发安全车'] },
-  { name: '第一段轮胎', focus: ['看不同轮胎配方的圈速差', '看谁被困在脏空气里', '看车手是否报告过热或推头'] },
-  { name: '进站窗口', focus: ['看进站前车距是否接近 pit loss', '看出站是否会遇到慢车', '看安全车/VSC 是否降低进站损失'] },
-  { name: '最后 10 圈', focus: ['看后车是否在 1 秒内', '看前车是否守内线牺牲出口', '看罚时是否改变实际名次'] }
+  { name: '发车', focus: ['看内线', '看中游', '看安全车'] },
+  { name: '第一段胎', focus: ['看圈速掉没掉', '看谁卡在脏空气', '看无线电抱怨'] },
+  { name: '进站窗', focus: ['看 pit loss', '看出站交通', '看 VSC/SC'] },
+  { name: '最后十圈', focus: ['看 1 秒差距', '看防守线', '看罚时'] }
 ]
 
 const terms = [
-  ['DRS', '可变尾翼减阻系统，后车通常需要在检测点进入前车 1 秒内才能使用。', '/rules/drs-overtake-mode'],
-  ['undercut', '先于对手进站换新胎，用新胎速度在对手停站前追回时间。', '/strategy/undercut'],
-  ['overcut', '比对手晚停，利用旧胎仍有速度、清洁空气或对手交通损失来反超。', '/strategy/overcut'],
-  ['pit window', '进站后能落在理想赛道位置的时间范围。', '/strategy/pit-window'],
-  ['dirty air', '前车扰乱后的气流会让后车下压力下降，尤其影响高速弯和轮胎温度。', '/strategy/dirty-air'],
-  ['DRS train', '一串车都在前车 1 秒内，大家都有 DRS，后车优势被抵消。', '/strategy/drs-train'],
-  ['track limits', '赛车是否越过赛道边界，违反后可能删圈、警告或罚时。', '/rules/track-limits']
+  ['DRS', '尾翼打开，直道更快。不是超车按钮。', '/rules/drs-overtake-mode'],
+  ['undercut', '先停换新胎，靠新胎圈速跳过对手。', '/strategy/undercut'],
+  ['overcut', '晚停，赌旧胎还能快或对手出站遇交通。', '/strategy/overcut'],
+  ['pit window', '停完会出在哪里。策略先看这个。', '/strategy/pit-window'],
+  ['dirty air', '跟车下压力变差，高速弯最明显。', '/strategy/dirty-air'],
+  ['DRS train', '一串车都有 DRS，后车反而超不动。', '/strategy/drs-train'],
+  ['track limits', '出白线太多，排位删圈，正赛可能罚。', '/rules/track-limits']
 ]
 
-const selectedTrackId = ref('shanghai')
-const selectedPhase = ref('进站窗口')
+const selectedTrackId = ref<TrackId>('shanghai')
+const selectedPhase = ref('进站窗')
 const query = ref('')
 const gap = ref(1.8)
 const tyreGain = ref(1.1)
-const responseLaps = ref(2)
 const trafficLoss = ref(0.6)
 
 const selectedTrack = computed(() => tracks.find((track) => track.id === selectedTrackId.value) ?? tracks[0])
 const phase = computed(() => phases.find((item) => item.name === selectedPhase.value) ?? phases[0])
 const filteredTerms = computed(() => {
   const keyword = query.value.trim().toLowerCase()
-  if (!keyword) return terms
-  return terms.filter(([term, desc]) => `${term} ${desc}`.toLowerCase().includes(keyword))
+  return terms.filter(([term, desc]) => !keyword || `${term} ${desc}`.toLowerCase().includes(keyword))
 })
-const undercutGain = computed(() => tyreGain.value * responseLaps.value - trafficLoss.value)
+const undercutGain = computed(() => tyreGain.value * 2 - trafficLoss.value)
 const undercutVerdict = computed(() => {
-  const remaining = gap.value - undercutGain.value
-  if (remaining <= 0) return '可以尝试：新胎收益覆盖了当前差距'
-  if (remaining <= 0.7) return '边缘机会：需要出站干净或对手旧胎掉速'
-  return '风险较高：当前差距或交通损失太大'
+  const left = gap.value - undercutGain.value
+  if (left <= 0) return '能打'
+  if (left <= 0.7) return '看出站'
+  return '别急'
 })
 
 const cards = [
-  ['第一次看 F1', '先抓发车、轮胎、DRS、安全车和队友对比。', '/guide/watching-f1'],
-  ['正赛怎么看', '按发车、轮胎段、进站窗口和最后十圈拆解比赛。', '/guide/race'],
-  ['轮胎与进站', '理解软中硬、pit loss 和安全车为什么改变策略。', '/rules/tyres'],
-  ['超车如何发生', '看出弯速度、尾流、DRS、轮胎和刹车区执行。', '/racecraft/overtaking'],
-  ['赛道图鉴', '每条赛道先看关键弯、超车点和正赛变量。', '/tracks/'],
-  ['资源导航', '官方资料、数据网站和内容创作者入口。', '/resources/']
+  ['第一次看 F1', '只看五件事。', '/guide/watching-f1'],
+  ['正赛怎么看', '按阶段看。', '/guide/race'],
+  ['轮胎与进站', '策略核心。', '/rules/tyres'],
+  ['超车', '从出弯开始。', '/racecraft/overtaking'],
+  ['赛道图鉴', '先认关键弯。', '/tracks/'],
+  ['资源', '继续深挖。', '/resources/']
 ]
 </script>
 
 <template>
   <main class="race-app">
-    <section class="app-hero">
+    <section class="race-hero">
       <div>
-        <p class="eyebrow">Racecraft 中文手册</p>
-        <h1>F1 新手观赛控制台</h1>
-        <p>把一场比赛拆成可操作的问题：现在看什么、术语是什么意思、进站是否合理、这条赛道哪里会发生攻防。</p>
+        <p class="race-kicker">RACECRAFT BOARD</p>
+        <h1>看懂一场 F1</h1>
+        <p>少背术语。盯位置、轮胎、DRS、进站窗。</p>
         <div class="hero-actions">
-          <a href="#watch">开始观赛</a>
-          <a href="#strategy">判断策略</a>
+          <a href="#track">看赛道</a>
+          <a href="#strategy">算策略</a>
           <a href="#terms">查术语</a>
         </div>
       </div>
-      <div class="timing-board">
-        <span>LIVE GUIDE</span>
-        <strong>RACE MODE</strong>
-        <dl>
-          <div><dt>第一关注</dt><dd>赛道位置</dd></div>
-          <div><dt>第二关注</dt><dd>轮胎窗口</dd></div>
-          <div><dt>第三关注</dt><dd>DRS 距离</dd></div>
-        </dl>
-      </div>
+      <TrackMap :track="selectedTrackId" />
     </section>
 
-    <section id="watch" class="app-panel">
-      <div class="panel-head">
-        <p class="eyebrow">Live Race Desk</p>
-        <h2>正赛观赛工作台</h2>
+    <section id="watch" class="race-panel race-desk">
+      <div class="panel-title">
+        <span>LIVE DESK</span>
+        <h2>现在看什么</h2>
       </div>
       <div class="desk-controls">
-        <label>比赛阶段<select v-model="selectedPhase"><option v-for="item in phases" :key="item.name">{{ item.name }}</option></select></label>
-        <label>当前赛道<select v-model="selectedTrackId"><option v-for="track in tracks" :key="track.id" :value="track.id">{{ track.fullName }}</option></select></label>
+        <label>阶段<select v-model="selectedPhase"><option v-for="item in phases" :key="item.name">{{ item.name }}</option></select></label>
+        <label>赛道<select v-model="selectedTrackId"><option v-for="track in tracks" :key="track.id" :value="track.id">{{ track.fullName }}</option></select></label>
       </div>
-      <div class="desk-grid">
-        <article class="desk-primary">
-          <h3>现在先看这 3 件事</h3>
-          <ol><li v-for="item in phase.focus" :key="item">{{ item }}</li></ol>
-        </article>
-        <article class="desk-card">
-          <h3>{{ selectedTrack.fullName }}</h3>
-          <p>{{ selectedTrack.summary }}</p>
-          <div class="metric-grid">
-            <span>超车 {{ selectedTrack.overtake }}</span>
-            <span>轮胎 {{ selectedTrack.tyre }}</span>
-            <span>DRS {{ selectedTrack.drs }}</span>
-          </div>
-        </article>
+      <div class="focus-grid">
+        <strong v-for="item in phase.focus" :key="item">{{ item }}</strong>
       </div>
     </section>
 
-    <section class="app-split">
-      <section id="strategy" class="app-panel">
-        <div class="panel-head">
-          <p class="eyebrow">Strategy Lab</p>
-          <h2>Undercut 判断器</h2>
+    <section id="track" class="race-panel track-desk">
+      <div class="panel-title">
+        <span>TRACK MAP</span>
+        <h2>{{ selectedTrack.fullName }}</h2>
+      </div>
+      <div class="track-tabs">
+        <button v-for="track in tracks" :key="track.id" :class="{ active: selectedTrackId === track.id }" type="button" @click="selectedTrackId = track.id">{{ track.name }}</button>
+      </div>
+      <div class="track-grid">
+        <TrackMap :track="selectedTrackId" />
+        <div class="track-copy">
+          <b>{{ selectedTrack.tag }}</b>
+          <p>{{ selectedTrack.summary }}</p>
+          <ul><li v-for="corner in selectedTrack.corners" :key="corner">{{ corner }}</li></ul>
+          <a class="read-more" :href="withBase(selectedTrack.link)">完整赛道页</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="race-split">
+      <section id="strategy" class="race-panel">
+        <div class="panel-title">
+          <span>STRATEGY</span>
+          <h2>Undercut 快算</h2>
         </div>
         <div class="slider-list">
-          <label>落后车距 {{ gap.toFixed(1) }} 秒<input v-model.number="gap" type="range" min="0.2" max="5" step="0.1"></label>
+          <label>落后 {{ gap.toFixed(1) }} 秒<input v-model.number="gap" type="range" min="0.2" max="5" step="0.1"></label>
           <label>新胎收益 {{ tyreGain.toFixed(1) }} 秒/圈<input v-model.number="tyreGain" type="range" min="0.1" max="2.5" step="0.1"></label>
-          <label>对手 {{ responseLaps }} 圈后回应<input v-model.number="responseLaps" type="range" min="1" max="5" step="1"></label>
-          <label>出站交通损失 {{ trafficLoss.toFixed(1) }} 秒<input v-model.number="trafficLoss" type="range" min="0" max="4" step="0.1"></label>
+          <label>交通损失 {{ trafficLoss.toFixed(1) }} 秒<input v-model.number="trafficLoss" type="range" min="0" max="4" step="0.1"></label>
         </div>
         <div class="verdict">
-          <strong>{{ undercutVerdict }}</strong>
-          <p>预计追回 {{ undercutGain.toFixed(1) }} 秒。策略不是玄学，而是时间差、轮胎、交通和赛道位置的组合。</p>
+          <span>{{ undercutVerdict }}</span>
+          <p>两圈预计追回 {{ undercutGain.toFixed(1) }} 秒。</p>
         </div>
       </section>
 
-      <section id="terms" class="app-panel">
-        <div class="panel-head">
-          <p class="eyebrow">Radio Decoder</p>
-          <h2>直播术语速查</h2>
+      <section id="terms" class="race-panel">
+        <div class="panel-title">
+          <span>RADIO</span>
+          <h2>术语速查</h2>
         </div>
-        <input v-model="query" class="term-input" type="search" placeholder="输入 DRS、undercut、脏空气...">
+        <input v-model="query" class="term-input" type="search" placeholder="DRS / undercut / 脏空气">
         <div class="term-list">
           <a v-for="[term, desc, link] in filteredTerms" :key="term" :href="withBase(link)">
             <strong>{{ term }}</strong>
@@ -208,25 +189,6 @@ const cards = [
           </a>
         </div>
       </section>
-    </section>
-
-    <section class="app-panel">
-      <div class="panel-head">
-        <p class="eyebrow">Track Desk</p>
-        <h2>赛道观察器</h2>
-      </div>
-      <div class="track-tabs">
-        <button v-for="track in tracks" :key="track.id" :class="{ active: selectedTrackId === track.id }" type="button" @click="selectedTrackId = track.id">{{ track.name }}</button>
-      </div>
-      <div class="track-console">
-        <div class="track-visual"><span>{{ selectedTrack.name }}</span></div>
-        <div>
-          <h3>{{ selectedTrack.fullName }} · {{ selectedTrack.type }}</h3>
-          <p>{{ selectedTrack.summary }}</p>
-          <ul><li v-for="corner in selectedTrack.corners" :key="corner">{{ corner }}</li></ul>
-          <a class="read-more" :href="withBase(selectedTrack.link)">打开赛道图鉴</a>
-        </div>
-      </div>
     </section>
 
     <section class="app-card-grid">
