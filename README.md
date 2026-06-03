@@ -35,7 +35,12 @@ npm run docs:preview
 
 仓库推送到 `main` 分支后，`.github/workflows/deploy.yml` 会自动安装依赖、构建 VitePress，并把 `docs/.vitepress/dist` 部署到 GitHub Pages。
 
-如果仓库不是用户或组织根域名仓库，可能需要配置 VitePress `base`。本项目支持通过环境变量设置：
+部署配置会在 GitHub Actions 中自动读取 `GITHUB_REPOSITORY`：
+
+- 如果仓库是 `username.github.io` 或 `org.github.io`，VitePress `base` 自动为 `/`。
+- 如果仓库是普通项目仓库，例如 `F1_rookie_guide`，VitePress `base` 自动为 `/F1_rookie_guide/`。
+
+如需自定义域名或特殊路径，也可以通过环境变量手动覆盖：
 
 ```bash
 VITEPRESS_BASE=/your-repo-name/ npm run docs:build
@@ -62,4 +67,3 @@ VITEPRESS_BASE=/your-repo-name/ npm run docs:build
 - 车队与车手独立页面
 - 术语搜索增强
 - 赛后数据复盘文章
-

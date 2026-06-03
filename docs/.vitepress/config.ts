@@ -5,6 +5,10 @@ import { defineConfig } from 'vitepress'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const siteTitle = '赛车战术板'
 const siteDescription = '面向中文新手的 F1 观赛入门手册'
+const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1]
+const isUserOrOrgPagesRepo = repositoryName?.endsWith('.github.io')
+const githubPagesBase = repositoryName && !isUserOrOrgPagesRepo ? `/${repositoryName}/` : '/'
+const base = process.env.VITEPRESS_BASE || githubPagesBase
 
 export default defineConfig({
   title: siteTitle,
@@ -12,7 +16,7 @@ export default defineConfig({
   lang: 'zh-CN',
   cleanUrls: true,
   lastUpdated: true,
-  base: process.env.VITEPRESS_BASE || '/',
+  base,
   head: [
     ['meta', { name: 'theme-color', content: '#14213d' }],
     ['meta', { name: 'keywords', content: 'F1, Formula 1, 赛车, 观赛指南, 新手, 策略, 规则, 赛道' }],
