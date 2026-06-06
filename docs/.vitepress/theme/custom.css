@@ -835,6 +835,10 @@ a.term-badge:hover {
 
 .track-map text {
   fill: #fff7f2;
+  stroke: #0d1016;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  paint-order: stroke;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 14px;
   font-weight: 900;

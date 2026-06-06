@@ -16,7 +16,7 @@ const activeTrack = computed(() => tracks.find((item) => item.id === props.track
       <path class="track-map__line" :d="activeTrack.path" />
       <g v-for="corner in activeTrack.corners" :key="corner.id">
         <circle class="track-map__dot" :cx="corner.x" :cy="corner.y" r="7" />
-        <text :x="corner.x + 10" :y="corner.y - 8">{{ corner.id }}</text>
+        <text :x="corner.labelX ?? corner.x + 10" :y="corner.labelY ?? corner.y - 8">{{ corner.id }}</text>
       </g>
     </svg>
     <div class="track-map__legend">
