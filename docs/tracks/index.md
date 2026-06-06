@@ -1,7 +1,7 @@
 # 赛道图鉴
 
 先看图，再看关键弯。  
-每张图都是本站自绘的非官方简化轮廓，用来帮助定位关键弯和观赛重点，不替代 FIA、Formula 1 或赛事方发布的正式赛道图。
+赛道轮廓来自 [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) 的开放地理数据（ODbL），页面中的长度校验优先参考 [FIA Licensed Circuits 清单](https://www.fia.com/sites/default/files/circuits_fia20260331_0.pdf)，海拔和起伏来自 [OpenTopoData SRTM30m](https://www.opentopodata.org/datasets/srtm/) 采样。本站不使用官方 F1/FIA 赛道图图片；街道赛和未匹配 FIA 当前配置的赛道会标注为开放数据或待校验。
 
 <TrackGallery />
 
