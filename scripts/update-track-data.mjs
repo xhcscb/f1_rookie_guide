@@ -300,6 +300,12 @@ const trackConfigs = [
 
 const excludeName = /pit|boxen|pitstraat|voie des stands|moto\s*gp|motogp|long lap|kart|drag/i
 const excludeRole = /pit|alternative/i
+const svgViewWidth = 380
+const svgViewHeight = 250
+const svgPadding = 22
+const satelliteTileTemplate = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile'
+const satelliteProvider = 'Esri World Imagery'
+const satelliteAttribution = 'Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community'
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -409,30 +415,32 @@ async function fetchWayGeometry(config) {
   }
 }
 
+function webMercator(point) {
+  const lat = Math.max(-85.05112878, Math.min(85.05112878, point.lat))
+  const sinLat = Math.sin((lat * Math.PI) / 180)
+  return {
+    x: (point.lon + 180) / 360,
+    y: 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)
+  }
+}
+
+function roundSvg(value) {
+  return Number(value.toFixed(2))
+}
+
 function projectLines(lines) {
-  const allPoints = lines.flatMap((line) => line.points)
-  const meanLat = allPoints.reduce((sum, point) => sum + point.lat, 0) / allPoints.length
-  const cosLat = Math.cos((meanLat * Math.PI) / 180)
-  const projected = lines.map((line) =>
-    line.points.map((point) => ({
-      x: point.lon * cosLat,
-      y: -point.lat
-    }))
-  )
+  const projected = lines.map((line) => line.points.map(webMercator))
 
   const flat = projected.flat()
   const minX = Math.min(...flat.map((point) => point.x))
   const maxX = Math.max(...flat.map((point) => point.x))
   const minY = Math.min(...flat.map((point) => point.y))
   const maxY = Math.max(...flat.map((point) => point.y))
-  const padding = 24
-  const viewWidth = 380
-  const viewHeight = 250
-  const scale = Math.min((viewWidth - padding * 2) / (maxX - minX), (viewHeight - padding * 2) / (maxY - minY))
+  const scale = Math.min((svgViewWidth - svgPadding * 2) / (maxX - minX), (svgViewHeight - svgPadding * 2) / (maxY - minY))
   const width = (maxX - minX) * scale
   const height = (maxY - minY) * scale
-  const offsetX = (viewWidth - width) / 2
-  const offsetY = (viewHeight - height) / 2
+  const offsetX = (svgViewWidth - width) / 2
+  const offsetY = (svgViewHeight - height) / 2
 
   const toSvgPoint = (point) => ({
     x: offsetX + (point.x - minX) * scale,
@@ -446,7 +454,70 @@ function projectLines(lines) {
       return `M${first.x.toFixed(1)} ${first.y.toFixed(1)} ${rest.map((point) => `L${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(' ')}`
     })
 
-  return paths.join(' ')
+  const path = paths.join(' ')
+  const viewBounds = {
+    minX: minX - offsetX / scale,
+    maxX: minX + (svgViewWidth - offsetX) / scale,
+    minY: minY - offsetY / scale,
+    maxY: minY + (svgViewHeight - offsetY) / scale
+  }
+
+  return {
+    path,
+    viewBounds,
+    toSvgPoint
+  }
+}
+
+function tileRange(bounds, zoom) {
+  const tilesPerAxis = 2 ** zoom
+  const minTileX = Math.max(0, Math.floor(bounds.minX * tilesPerAxis))
+  const maxTileX = Math.min(tilesPerAxis - 1, Math.floor(bounds.maxX * tilesPerAxis))
+  const minTileY = Math.max(0, Math.floor(bounds.minY * tilesPerAxis))
+  const maxTileY = Math.min(tilesPerAxis - 1, Math.floor(bounds.maxY * tilesPerAxis))
+
+  return {
+    minTileX,
+    maxTileX,
+    minTileY,
+    maxTileY,
+    count: (maxTileX - minTileX + 1) * (maxTileY - minTileY + 1)
+  }
+}
+
+function pickSatelliteZoom(bounds) {
+  for (const zoom of [17, 16, 15, 14, 13]) {
+    if (tileRange(bounds, zoom).count <= 36) return zoom
+  }
+  return 13
+}
+
+function createSatelliteLayer(projection) {
+  const zoom = pickSatelliteZoom(projection.viewBounds)
+  const range = tileRange(projection.viewBounds, zoom)
+  const tilesPerAxis = 2 ** zoom
+  const tiles = []
+
+  for (let tileY = range.minTileY; tileY <= range.maxTileY; tileY += 1) {
+    for (let tileX = range.minTileX; tileX <= range.maxTileX; tileX += 1) {
+      const topLeft = projection.toSvgPoint({ x: tileX / tilesPerAxis, y: tileY / tilesPerAxis })
+      const bottomRight = projection.toSvgPoint({ x: (tileX + 1) / tilesPerAxis, y: (tileY + 1) / tilesPerAxis })
+      tiles.push({
+        url: `${satelliteTileTemplate}/${zoom}/${tileY}/${tileX}`,
+        x: roundSvg(topLeft.x),
+        y: roundSvg(topLeft.y),
+        width: roundSvg(bottomRight.x - topLeft.x),
+        height: roundSvg(bottomRight.y - topLeft.y)
+      })
+    }
+  }
+
+  return {
+    provider: satelliteProvider,
+    attribution: satelliteAttribution,
+    zoom,
+    tiles
+  }
 }
 
 function pickCornerPositions(path, cornerTemplates) {
@@ -512,7 +583,9 @@ async function buildTrack(config) {
   const meta = oldSummaries[config.id]
   const geometry = config.osm.relation ? await fetchRelationGeometry(config) : await fetchWayGeometry(config)
   const osmLengthKm = Number((geometry.lines.reduce((sum, line) => sum + lineLength(line.points), 0) / 1000).toFixed(3))
-  const path = projectLines(geometry.lines)
+  const projection = projectLines(geometry.lines)
+  const path = projection.path
+  const satellite = createSatelliteLayer(projection)
   const elevations = await fetchElevations(samplePoints(geometry.lines))
   const elevation =
     elevations.length > 0
@@ -538,6 +611,7 @@ async function buildTrack(config) {
     id: config.id,
     ...meta,
     path,
+    satellite,
     corners: pickCornerPositions(path, meta.corners),
     link: `/tracks/${config.id}`,
     center: { lat: config.center[0], lon: config.center[1] },
@@ -578,6 +652,21 @@ export type FiaCircuitSpec = {
   widthM: number
 }
 
+export type TrackSatelliteTile = {
+  url: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+export type TrackSatelliteLayer = {
+  provider: string
+  attribution: string
+  zoom: number
+  tiles: TrackSatelliteTile[]
+}
+
 export type TrackInfo = {
   id: TrackId
   name: string
@@ -585,6 +674,7 @@ export type TrackInfo = {
   type: string
   summary: string
   path: string
+  satellite: TrackSatelliteLayer
   corners: TrackCorner[]
   link: string
   center: { lat: number; lon: number }
@@ -620,6 +710,11 @@ export const trackDataSources = {
   elevation: {
     label: 'OpenTopoData SRTM30m',
     url: 'https://www.opentopodata.org/datasets/srtm/'
+  },
+  satellite: {
+    label: 'Esri World Imagery',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+    attribution: 'Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community'
   }
 } as const
 

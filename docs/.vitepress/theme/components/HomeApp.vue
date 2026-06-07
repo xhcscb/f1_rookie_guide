@@ -57,7 +57,7 @@ const starters = [
       </div>
       <div class="home-track-grid">
         <a v-for="track in tracks" :key="track.id" class="home-track-card" :href="pageHref(track.link)">
-          <TrackMap :track="track.id" />
+          <TrackMap :track="track.id" compact />
           <strong>{{ track.name }}</strong>
           <p>{{ track.type }}</p>
         </a>

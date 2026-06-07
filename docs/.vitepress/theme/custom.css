@@ -794,9 +794,9 @@ a.term-badge:hover {
 
 .track-map {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.72fr);
-  gap: 14px;
-  align-items: center;
+  grid-template-columns: minmax(260px, 1.08fr) minmax(220px, 0.72fr);
+  gap: 16px;
+  align-items: start;
   border: 1px solid rgba(255, 75, 85, 0.32);
   border-radius: 8px;
   padding: 14px;
@@ -805,24 +805,77 @@ a.term-badge:hover {
     #0d1016;
 }
 
+.track-map--compact {
+  grid-template-columns: 1fr;
+  padding: 10px;
+}
+
+.track-map__canvas {
+  position: relative;
+  min-width: 0;
+}
+
 .track-map svg {
+  display: block;
   width: 100%;
   height: auto;
-  overflow: visible;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.track-map__toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  padding: 0 9px;
+  background: rgba(5, 7, 11, 0.78);
+  color: #fff7f2;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.track-map__toggle input {
+  margin: 0;
+  accent-color: #d91425;
+}
+
+.track-map__satellite image {
+  opacity: 0.96;
+}
+
+.track-map__satellite-wash {
+  fill: rgba(8, 9, 12, 0.16);
 }
 
 .track-map__shadow {
   fill: none;
-  stroke: rgba(255, 34, 48, 0.28);
-  stroke-width: 28;
+  stroke: rgba(2, 4, 7, 0.86);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track-map__accent {
+  fill: none;
+  stroke: #d91425;
+  stroke-width: 6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .track-map__line {
   fill: none;
-  stroke: #f3eee9;
-  stroke-width: 13;
+  stroke: #fffaf4;
+  stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -830,7 +883,7 @@ a.term-badge:hover {
 .track-map__dot {
   fill: #ff2f3c;
   stroke: #fff7f2;
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
 
 .track-map text {
@@ -840,8 +893,22 @@ a.term-badge:hover {
   stroke-width: 3px;
   paint-order: stroke;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 900;
+}
+
+.track-map__attribution {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 2;
+  max-width: calc(100% - 16px);
+  border-radius: 4px;
+  padding: 3px 6px;
+  background: rgba(5, 7, 11, 0.7);
+  color: rgba(255, 247, 242, 0.82);
+  font-size: 0.62rem;
+  line-height: 1.25;
 }
 
 .track-map__legend strong {
