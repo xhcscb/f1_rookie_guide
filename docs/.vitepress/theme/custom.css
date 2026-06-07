@@ -823,37 +823,45 @@ a.term-badge:hover {
   overflow: hidden;
 }
 
-.track-map__toggle {
+.track-map__mode {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 3px;
   min-height: 30px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 6px;
-  padding: 0 9px;
+  padding: 3px;
   background: rgba(5, 7, 11, 0.78);
+}
+
+.track-map__mode button {
+  min-height: 24px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0 8px;
+  background: transparent;
   color: #fff7f2;
   font-size: 0.78rem;
   font-weight: 850;
-  line-height: 1;
+  font-family: inherit;
   cursor: pointer;
 }
 
-.track-map__toggle input {
-  margin: 0;
-  accent-color: #d91425;
+.track-map__mode button.active {
+  background: #d91425;
+  color: #fff;
 }
 
 .track-map__satellite image {
-  opacity: 0.96;
+  opacity: 1;
 }
 
 .track-map__satellite-wash {
-  fill: rgba(8, 9, 12, 0.16);
+  fill: rgba(5, 7, 11, 0.08);
 }
 
 .track-map__shadow {
@@ -880,6 +888,30 @@ a.term-badge:hover {
   stroke-linejoin: round;
 }
 
+.track-map--real .track-map__shadow {
+  stroke: rgba(0, 0, 0, 0.82);
+  stroke-width: 5;
+}
+
+.track-map--real .track-map__accent {
+  stroke: rgba(255, 47, 60, 0.88);
+  stroke-width: 2.5;
+}
+
+.track-map--real .track-map__line {
+  stroke: rgba(255, 250, 244, 0.88);
+  stroke-width: 1.25;
+}
+
+.track-map__hit-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 20;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: stroke;
+}
+
 .track-map__dot {
   fill: #ff2f3c;
   stroke: #fff7f2;
@@ -897,6 +929,34 @@ a.term-badge:hover {
   font-weight: 900;
 }
 
+.track-map__sample {
+  fill: rgba(255, 247, 242, 0.42);
+  stroke: rgba(5, 7, 11, 0.72);
+  stroke-width: 1;
+}
+
+.track-map__sample.active {
+  fill: #ffd166;
+  stroke: #05070b;
+  stroke-width: 1.8;
+}
+
+.track-map--real .track-map__sample {
+  fill: rgba(255, 209, 102, 0.38);
+}
+
+.track-map__probe line {
+  stroke: rgba(255, 209, 102, 0.58);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.track-map__probe circle {
+  fill: none;
+  stroke: #ffd166;
+  stroke-width: 2.2;
+}
+
 .track-map__attribution {
   position: absolute;
   left: 8px;
@@ -909,6 +969,81 @@ a.term-badge:hover {
   color: rgba(255, 247, 242, 0.82);
   font-size: 0.62rem;
   line-height: 1.25;
+}
+
+.track-map__probe-card {
+  border: 1px solid rgba(255, 209, 102, 0.24);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+  background: rgba(255, 209, 102, 0.07);
+}
+
+.track-map__probe-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.track-map__probe-card div {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.track-map__probe-card dt {
+  color: #bcaeaa;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.track-map__probe-card dd {
+  min-width: 0;
+  margin: 0;
+  color: #fff7f2;
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.track-map__profile {
+  width: 100%;
+  min-height: 118px;
+  margin: 0 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.035);
+  cursor: crosshair;
+}
+
+.track-map__profile-axis {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1;
+}
+
+.track-map__profile-line {
+  fill: none;
+  stroke: #ffd166;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track-map__profile-marker {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+}
+
+.track-map__profile-dot {
+  fill: #ff2f3c;
+  stroke: #fff7f2;
+  stroke-width: 1.4;
+}
+
+.track-map__profile text {
+  fill: #cfc2bb;
+  stroke: none;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .track-map__legend strong {

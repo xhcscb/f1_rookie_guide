@@ -520,6 +520,65 @@ function createSatelliteLayer(projection) {
   }
 }
 
+function buildDistanceSamples(lines, maxSamples = 72) {
+  const segments = []
+  let totalDistanceM = 0
+
+  for (const line of lines) {
+    for (let index = 1; index < line.points.length; index += 1) {
+      const start = line.points[index - 1]
+      const end = line.points[index]
+      const lengthM = distanceMeters(start, end)
+      if (lengthM <= 0) continue
+      segments.push({
+        start,
+        end,
+        startDistanceM: totalDistanceM,
+        endDistanceM: totalDistanceM + lengthM
+      })
+      totalDistanceM += lengthM
+    }
+  }
+
+  if (!segments.length) return []
+
+  const count = Math.min(maxSamples, Math.max(2, Math.round(totalDistanceM / 80)))
+  const samples = []
+
+  for (let index = 0; index < count; index += 1) {
+    const targetDistanceM = count === 1 ? 0 : (totalDistanceM * index) / (count - 1)
+    const segment = segments.find((item) => item.endDistanceM >= targetDistanceM) ?? segments[segments.length - 1]
+    const segmentDistanceM = segment.endDistanceM - segment.startDistanceM
+    const ratio = segmentDistanceM > 0 ? (targetDistanceM - segment.startDistanceM) / segmentDistanceM : 0
+
+    samples.push({
+      lat: segment.start.lat + (segment.end.lat - segment.start.lat) * ratio,
+      lon: segment.start.lon + (segment.end.lon - segment.start.lon) * ratio,
+      distanceKm: Number((targetDistanceM / 1000).toFixed(3))
+    })
+  }
+
+  return samples
+}
+
+function buildElevationProfile(samples, elevations, projection) {
+  return {
+    dataset: 'SRTM30m',
+    samples: samples.map((sample, index) => {
+      const svgPoint = projection.toSvgPoint(webMercator(sample))
+      const elevation = elevations[index]
+      return {
+        distanceKm: sample.distanceKm,
+        lat: Number(sample.lat.toFixed(6)),
+        lon: Number(sample.lon.toFixed(6)),
+        x: roundSvg(svgPoint.x),
+        y: roundSvg(svgPoint.y),
+        elevationM: typeof elevation === 'number' ? Math.round(elevation) : null
+      }
+    })
+  }
+}
+
 function pickCornerPositions(path, cornerTemplates) {
   const matchPoints = [...path.matchAll(/[ML](-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g)].map((match) => ({
     x: Number(match[1]),
@@ -547,6 +606,7 @@ function samplePoints(lines, maxSamples = 35) {
 }
 
 async function fetchElevations(points) {
+  if (!points.length) return []
   const locations = points.map((point) => `${point.lat.toFixed(6)},${point.lon.toFixed(6)}`).join('|')
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
@@ -555,7 +615,7 @@ async function fetchElevations(points) {
       }, 12000)
       const data = await response.json()
       if (data.status !== 'OK') return []
-      return data.results.map((item) => item.elevation).filter((value) => typeof value === 'number')
+      return data.results.map((item) => (typeof item.elevation === 'number' ? item.elevation : null))
     } catch (error) {
       if (attempt === 3) {
         console.warn(`elevation skipped: ${error.message}`)
@@ -586,15 +646,18 @@ async function buildTrack(config) {
   const projection = projectLines(geometry.lines)
   const path = projection.path
   const satellite = createSatelliteLayer(projection)
-  const elevations = await fetchElevations(samplePoints(geometry.lines))
+  const profileSamples = buildDistanceSamples(geometry.lines)
+  const profileElevations = await fetchElevations(profileSamples)
+  const profile = buildElevationProfile(profileSamples, profileElevations, projection)
+  const validElevations = profile.samples.map((sample) => sample.elevationM).filter((value) => typeof value === 'number')
   const elevation =
-    elevations.length > 0
+    validElevations.length > 0
       ? {
           dataset: 'SRTM30m',
-          meanM: Math.round(elevations.reduce((sum, value) => sum + value, 0) / elevations.length),
-          minM: Math.round(Math.min(...elevations)),
-          maxM: Math.round(Math.max(...elevations)),
-          rangeM: Math.round(Math.max(...elevations) - Math.min(...elevations))
+          meanM: Math.round(validElevations.reduce((sum, value) => sum + value, 0) / validElevations.length),
+          minM: Math.round(Math.min(...validElevations)),
+          maxM: Math.round(Math.max(...validElevations)),
+          rangeM: Math.round(Math.max(...validElevations) - Math.min(...validElevations))
         }
       : null
 
@@ -612,6 +675,7 @@ async function buildTrack(config) {
     ...meta,
     path,
     satellite,
+    profile,
     corners: pickCornerPositions(path, meta.corners),
     link: `/tracks/${config.id}`,
     center: { lat: config.center[0], lon: config.center[1] },
@@ -667,6 +731,20 @@ export type TrackSatelliteLayer = {
   tiles: TrackSatelliteTile[]
 }
 
+export type TrackProfileSample = {
+  distanceKm: number
+  lat: number
+  lon: number
+  x: number
+  y: number
+  elevationM: number | null
+}
+
+export type TrackElevationProfile = {
+  dataset: string
+  samples: TrackProfileSample[]
+}
+
 export type TrackInfo = {
   id: TrackId
   name: string
@@ -675,6 +753,7 @@ export type TrackInfo = {
   summary: string
   path: string
   satellite: TrackSatelliteLayer
+  profile: TrackElevationProfile
   corners: TrackCorner[]
   link: string
   center: { lat: number; lon: number }
