@@ -9,15 +9,25 @@ const props = withDefaults(defineProps<{ track?: TrackId; compact?: boolean }>()
 
 const mapMode = ref<'real' | 'diagram'>(props.compact ? 'diagram' : 'real')
 const activeSampleIndex = ref(0)
+const zoomLevel = ref(1)
+const pan = ref({ x: 0, y: 0 })
+const dragStart = ref<{ pointerId: number; clientX: number; clientY: number; panX: number; panY: number } | null>(null)
+const isDragging = ref(false)
 const activeTrack = computed(() => tracks.find((item) => item.id === props.track) ?? tracks[0])
 const clipId = computed(() => `track-map-clip-${activeTrack.value.id}`)
 const profileSamples = computed(() => activeTrack.value.profile.samples)
 const showRealMap = computed(() => !props.compact && mapMode.value === 'real')
+const mapFrame = { width: 380, height: 250 }
+const minZoom = 1
+const maxZoom = 4
 
 watch(activeTrack, () => {
   activeSampleIndex.value = 0
+  resetMapView()
   if (!props.compact) mapMode.value = 'real'
 })
+
+watch(mapMode, () => resetMapView())
 
 const qualityLabel = computed(() => {
   switch (activeTrack.value.source.quality) {
@@ -82,6 +92,11 @@ const elevationLabel = computed(() => {
   return sample?.elevationM === null || sample?.elevationM === undefined ? '暂无采样' : `${sample.elevationM} m`
 })
 
+const mapTransform = computed(() => {
+  if (!showRealMap.value) return 'translate(0 0) scale(1)'
+  return `translate(${pan.value.x.toFixed(2)} ${pan.value.y.toFixed(2)}) scale(${zoomLevel.value.toFixed(3)})`
+})
+
 function setActiveSample(index: number) {
   activeSampleIndex.value = Math.max(0, Math.min(index, profileSamples.value.length - 1))
 }
@@ -96,15 +111,64 @@ function svgPointFromEvent(event: MouseEvent) {
   return point.matrixTransform(matrix.inverse())
 }
 
+function mapPointFromSvgPoint(point: DOMPoint) {
+  if (!showRealMap.value) return point
+  return {
+    x: (point.x - pan.value.x) / zoomLevel.value,
+    y: (point.y - pan.value.y) / zoomLevel.value
+  }
+}
+
+function clampZoom(value: number) {
+  return Math.max(minZoom, Math.min(maxZoom, value))
+}
+
+function clampPan(zoom: number, nextPan: { x: number; y: number }) {
+  if (zoom <= minZoom) return { x: 0, y: 0 }
+  return {
+    x: Math.min(0, Math.max(mapFrame.width * (1 - zoom), nextPan.x)),
+    y: Math.min(0, Math.max(mapFrame.height * (1 - zoom), nextPan.y))
+  }
+}
+
+function applyZoom(nextZoom: number, center = { x: mapFrame.width / 2, y: mapFrame.height / 2 }) {
+  const zoom = clampZoom(nextZoom)
+  const anchor = {
+    x: (center.x - pan.value.x) / zoomLevel.value,
+    y: (center.y - pan.value.y) / zoomLevel.value
+  }
+  zoomLevel.value = zoom
+  pan.value = clampPan(zoom, {
+    x: center.x - anchor.x * zoom,
+    y: center.y - anchor.y * zoom
+  })
+}
+
+function zoomIn() {
+  applyZoom(zoomLevel.value * 1.3)
+}
+
+function zoomOut() {
+  applyZoom(zoomLevel.value / 1.3)
+}
+
+function resetMapView() {
+  zoomLevel.value = 1
+  pan.value = { x: 0, y: 0 }
+  dragStart.value = null
+  isDragging.value = false
+}
+
 function selectNearestMapSample(event: MouseEvent) {
   if (props.compact || !profileSamples.value.length) return
   const point = svgPointFromEvent(event)
   if (!point) return
+  const mapPoint = mapPointFromSvgPoint(point)
   let nearestIndex = 0
   let nearestDistance = Number.POSITIVE_INFINITY
 
   profileSamples.value.forEach((sample, index) => {
-    const distance = (sample.x - point.x) ** 2 + (sample.y - point.y) ** 2
+    const distance = (sample.x - mapPoint.x) ** 2 + (sample.y - mapPoint.y) ** 2
     if (distance < nearestDistance) {
       nearestDistance = distance
       nearestIndex = index
@@ -112,6 +176,63 @@ function selectNearestMapSample(event: MouseEvent) {
   })
 
   setActiveSample(nearestIndex)
+}
+
+function handleMapPointerDown(event: PointerEvent) {
+  if (props.compact) return
+  if (!showRealMap.value) {
+    selectNearestMapSample(event)
+    return
+  }
+
+  const svg = event.currentTarget as SVGSVGElement
+  svg.setPointerCapture?.(event.pointerId)
+  dragStart.value = {
+    pointerId: event.pointerId,
+    clientX: event.clientX,
+    clientY: event.clientY,
+    panX: pan.value.x,
+    panY: pan.value.y
+  }
+  isDragging.value = false
+}
+
+function handleMapPointerMove(event: PointerEvent) {
+  if (props.compact) return
+
+  if (dragStart.value && showRealMap.value) {
+    const svg = event.currentTarget as SVGSVGElement
+    const rect = svg.getBoundingClientRect()
+    const dx = ((event.clientX - dragStart.value.clientX) * mapFrame.width) / rect.width
+    const dy = ((event.clientY - dragStart.value.clientY) * mapFrame.height) / rect.height
+    if (Math.abs(dx) + Math.abs(dy) > 1.6) isDragging.value = true
+
+    if (isDragging.value) {
+      pan.value = clampPan(zoomLevel.value, {
+        x: dragStart.value.panX + dx,
+        y: dragStart.value.panY + dy
+      })
+      return
+    }
+  }
+
+  selectNearestMapSample(event)
+}
+
+function handleMapPointerEnd(event: PointerEvent) {
+  if (!dragStart.value) return
+  const svg = event.currentTarget as SVGSVGElement
+  svg.releasePointerCapture?.(dragStart.value.pointerId)
+  if (!isDragging.value) selectNearestMapSample(event)
+  dragStart.value = null
+  isDragging.value = false
+}
+
+function handleMapWheel(event: WheelEvent) {
+  if (props.compact || !showRealMap.value) return
+  const point = svgPointFromEvent(event)
+  if (!point) return
+  applyZoom(zoomLevel.value * (event.deltaY < 0 ? 1.18 : 1 / 1.18), point)
 }
 
 function selectNearestProfileSample(event: MouseEvent) {
@@ -143,12 +264,23 @@ function selectNearestProfileSample(event: MouseEvent) {
         <button type="button" :class="{ active: mapMode === 'diagram' }" @click="mapMode = 'diagram'">轮廓图</button>
       </div>
 
+      <div v-if="showRealMap" class="track-map__zoom-controls" role="group" aria-label="地图缩放">
+        <button type="button" aria-label="放大地图" @click="zoomIn">+</button>
+        <button type="button" aria-label="缩小地图" @click="zoomOut">-</button>
+        <button type="button" aria-label="重置地图视图" @click="resetMapView">{{ Math.round(zoomLevel * 100) }}%</button>
+      </div>
+
       <svg
+        :class="{ 'is-dragging': isDragging }"
         viewBox="0 0 380 250"
         role="img"
         :aria-label="`${activeTrack.fullName}互动赛道图`"
-        @mousemove="selectNearestMapSample"
-        @click="selectNearestMapSample"
+        @pointerdown="handleMapPointerDown"
+        @pointermove="handleMapPointerMove"
+        @pointerup="handleMapPointerEnd"
+        @pointercancel="handleMapPointerEnd"
+        @pointerleave="handleMapPointerEnd"
+        @wheel.prevent="handleMapWheel"
       >
         <defs>
           <clipPath :id="clipId">
@@ -157,45 +289,47 @@ function selectNearestProfileSample(event: MouseEvent) {
         </defs>
 
         <g :clip-path="`url(#${clipId})`">
-          <g v-if="showRealMap" class="track-map__satellite">
-            <image
-              v-for="tile in activeTrack.satellite.tiles"
-              :key="tile.url"
-              :href="tile.url"
-              :x="tile.x"
-              :y="tile.y"
-              :width="tile.width"
-              :height="tile.height"
-              preserveAspectRatio="none"
-            />
-            <rect class="track-map__satellite-wash" width="380" height="250" />
-          </g>
-        </g>
+          <g class="track-map__viewport" :transform="mapTransform">
+            <g v-if="showRealMap" class="track-map__satellite">
+              <image
+                v-for="tile in activeTrack.satellite.tiles"
+                :key="tile.url"
+                :href="tile.url"
+                :x="tile.x"
+                :y="tile.y"
+                :width="tile.width"
+                :height="tile.height"
+                preserveAspectRatio="none"
+              />
+              <rect class="track-map__satellite-wash" width="380" height="250" />
+            </g>
 
-        <path class="track-map__shadow" :d="activeTrack.path" />
-        <path class="track-map__accent" :d="activeTrack.path" />
-        <path class="track-map__line" :d="activeTrack.path" />
-        <path v-if="!compact" class="track-map__hit-path" :d="activeTrack.path" />
+            <path class="track-map__shadow" :d="activeTrack.path" />
+            <path class="track-map__accent" :d="activeTrack.path" />
+            <path class="track-map__line" :d="activeTrack.path" />
+            <path v-if="!compact" class="track-map__hit-path" :d="activeTrack.path" />
 
-        <g v-if="!compact">
-          <circle
-            v-for="(sample, index) in profileSamples"
-            :key="`${activeTrack.id}-${index}`"
-            class="track-map__sample"
-            :class="{ active: index === activeSampleIndex }"
-            :cx="sample.x"
-            :cy="sample.y"
-            :r="index === activeSampleIndex ? 4.6 : 2.1"
-          />
+            <g v-if="!compact">
+              <circle
+                v-for="(sample, index) in profileSamples"
+                :key="`${activeTrack.id}-${index}`"
+                class="track-map__sample"
+                :class="{ active: index === activeSampleIndex }"
+                :cx="sample.x"
+                :cy="sample.y"
+                :r="index === activeSampleIndex ? 4.6 : 2.1"
+              />
 
-          <g v-if="activeSample" class="track-map__probe">
-            <line :x1="activeSample.x" :y1="activeSample.y" :x2="activeSample.x" y2="238" />
-            <circle :cx="activeSample.x" :cy="activeSample.y" r="6.2" />
-          </g>
+              <g v-if="activeSample" class="track-map__probe">
+                <line :x1="activeSample.x" :y1="activeSample.y" :x2="activeSample.x" y2="238" />
+                <circle :cx="activeSample.x" :cy="activeSample.y" r="6.2" />
+              </g>
 
-          <g v-for="corner in activeTrack.corners" :key="corner.id">
-            <circle class="track-map__dot" :cx="corner.x" :cy="corner.y" r="4.2" />
-            <text :x="corner.labelX ?? corner.x + 10" :y="corner.labelY ?? corner.y - 8">{{ corner.id }}</text>
+              <g v-for="corner in activeTrack.corners" :key="corner.id">
+                <circle class="track-map__dot" :cx="corner.x" :cy="corner.y" r="4.2" />
+                <text :x="corner.labelX ?? corner.x + 10" :y="corner.labelY ?? corner.y - 8">{{ corner.id }}</text>
+              </g>
+            </g>
           </g>
         </g>
       </svg>
@@ -225,10 +359,6 @@ function selectNearestProfileSample(event: MouseEvent) {
           <div>
             <dt>海拔</dt>
             <dd>{{ elevationLabel }}</dd>
-          </div>
-          <div>
-            <dt>坐标</dt>
-            <dd>{{ activeSample.lat.toFixed(5) }}, {{ activeSample.lon.toFixed(5) }}</dd>
           </div>
         </dl>
       </div>

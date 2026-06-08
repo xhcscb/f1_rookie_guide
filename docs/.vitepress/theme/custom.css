@@ -823,6 +823,15 @@ a.term-badge:hover {
   overflow: hidden;
 }
 
+.track-map--real .track-map__canvas svg {
+  cursor: grab;
+  touch-action: none;
+}
+
+.track-map--real .track-map__canvas svg.is-dragging {
+  cursor: grabbing;
+}
+
 .track-map__mode {
   position: absolute;
   top: 10px;
@@ -854,6 +863,47 @@ a.term-badge:hover {
 .track-map__mode button.active {
   background: #d91425;
   color: #fff;
+}
+
+.track-map__zoom-controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  padding: 3px;
+  background: rgba(5, 7, 11, 0.78);
+}
+
+.track-map__zoom-controls button {
+  min-width: 28px;
+  min-height: 26px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff7f2;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.track-map__zoom-controls button:hover,
+.track-map__mode button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.track-map__mode button.active:hover {
+  background: #d91425;
+}
+
+.track-map__zoom-controls button:last-child {
+  min-width: 48px;
 }
 
 .track-map__satellite image {
