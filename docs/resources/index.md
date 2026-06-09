@@ -4,7 +4,7 @@
 
 <div class="card-grid two">
   <ConceptCard title="官方资料" desc="赛历、规则、官方术语、车队车手名单和比赛结果。适合做最终核对，不适合只看二手转述。" link="/resources/official" />
-  <ConceptCard title="数据网站" desc="圈速、stint、进站、轮胎衰退和位置变化。适合赛后复盘，也适合开发者练习数据分析。" link="/resources/data-sites" />
+  <ConceptCard title="数据网站" desc="实时计时、圈速、stint、进站、轮胎衰退和位置变化。适合赛中辅助观赛、赛后复盘和开发者练习。" link="/resources/data-sites" />
   <ConceptCard title="英文内容" desc="解释型视频、新闻分析和赛后复盘。适合想理解规则、技术和策略细节的读者。" link="/resources/creators" />
   <ConceptCard title="中文内容" desc="中文观赛入口、中文检索方式和内容筛选标准。适合想低门槛追赛的新手。" link="/resources/chinese" />
 </div>
@@ -13,7 +13,7 @@
 
 1. 先用官方资料核对事实：赛历、规则、处罚、车队和车手名单都可能变化。
 2. 再用解释型内容理解原因：例如为什么要 undercut，为什么轮胎会掉速。
-3. 最后用数据站点复盘：看圈速、轮胎、交通和安全车窗口是否支持你的判断。
+3. 最后用数据站点辅助观赛或复盘：看实时计时、圈速、轮胎、交通和安全车窗口是否支持你的判断。
 
 ## 筛选原则
 

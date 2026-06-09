@@ -1,6 +1,55 @@
 # 数据网站
 
-数据网站适合赛后复盘：看圈速、stint、进站、轮胎衰退和位置变化。本站不接入实时数据，也不把这些站点作为后端数据源；读者使用时应注意各站的数据许可、缓存规则和更新频率。
+数据网站适合赛中辅助观赛和赛后复盘：看实时计时、圈速、stint、进站、轮胎衰退和位置变化。本站不接入实时数据，也不把这些站点作为后端数据源；读者使用时应注意各站的数据许可、缓存规则、登录要求和更新频率。
+
+## 实时数据呈现
+
+<div class="card-grid two">
+  <ResourceCard
+    title="F1 COSMOS（f1cosmo）"
+    desc="实时计时和比赛数据呈现网站，适合边看比赛边观察车手间隔、位置变化和轮胎信息。非官方工具，使用时应留意数据延迟和来源说明。"
+    url="https://f1cosmos.com/"
+    :tags="['Live Timing', '实时数据', '观赛辅助']"
+    level="新手"
+  />
+  <ResourceCard
+    title="F1 Live Timing"
+    desc="Formula 1 官方实时计时入口，适合核对赛中计时、分段和车手状态。部分功能可能受账号、地区或订阅限制影响。"
+    url="https://www.formula1.com/en/timing/f1-live"
+    :tags="['官方', 'Live Timing', '实时数据']"
+    level="新手"
+  />
+  <ResourceCard
+    title="Pitwall"
+    desc="面向 F1 观赛的数据仪表盘，适合查看实时或近实时的计时、位置和比赛状态。适合已经理解基础计时术语的读者。"
+    url="https://pitwall.tv/"
+    :tags="['仪表盘', '实时数据', '观赛辅助']"
+    level="进阶"
+  />
+  <ResourceCard
+    title="F1 LivePulse"
+    desc="实时比赛状态和数据展示入口，适合快速查看车手位置、间隔和赛事状态。适合作为官方计时之外的辅助视图。"
+    url="https://www.f1livepulse.com/en"
+    :tags="['Live Timing', '实时数据', '图表']"
+    level="进阶"
+  />
+  <ResourceCard
+    title="OpenF1 OW"
+    desc="基于 OpenF1 数据的网页展示工具，适合观察实时数据字段如何转化成观赛仪表盘，也适合开发者参考交互设计。"
+    url="https://www.openf1ow.com/"
+    :tags="['OpenF1', '实时数据', '开源生态']"
+    level="开发者"
+  />
+  <ResourceCard
+    title="MultiViewer"
+    desc="多视角观赛和计时辅助工具，适合已经使用合法转播或 F1 TV 的读者理解间隔、车载视角和位置变化。"
+    url="https://multiviewer.app/"
+    :tags="['计时', '工具', '观赛辅助']"
+    level="进阶"
+  />
+</div>
+
+## 赛后复盘与数据源
 
 <div class="card-grid two">
   <ResourceCard
@@ -32,13 +81,6 @@
     level="进阶"
   />
   <ResourceCard
-    title="MultiViewer"
-    desc="多视角观赛和计时辅助工具，适合已经使用合法转播或 F1 TV 的读者理解间隔、车载视角和位置变化。"
-    url="https://multiviewer.app/"
-    :tags="['计时', '工具', '观赛辅助']"
-    level="进阶"
-  />
-  <ResourceCard
     title="F1DB"
     desc="开源历史数据库，提供 CSV、JSON、SQL 和 SQLite 等格式。适合做历史数据查询、SQL 练习和长期统计项目。"
     url="https://github.com/f1db/f1db"
@@ -49,4 +91,4 @@
 
 ## 使用建议
 
-数据图表很容易让人过度解读。看圈速时要同时考虑轮胎、油量、交通、安全车、车手任务和天气；不要把单圈最快直接等同于赛车长期速度。使用 API 或数据集时，请先阅读许可和速率限制，避免高频请求。
+实时数据有延迟、丢包和字段解释差异，适合辅助观赛，不适合替代官方赛会文件。看圈速时要同时考虑轮胎、油量、交通、安全车、车手任务和天气；不要把单圈最快直接等同于赛车长期速度。使用 API、数据集或非官方仪表盘时，请先阅读许可、速率限制和账号要求，避免高频请求或违反服务条款。
