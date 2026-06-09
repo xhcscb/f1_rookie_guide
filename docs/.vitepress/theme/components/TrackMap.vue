@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{ track?: TrackId; compact?: boolean }>()
   compact: false
 })
 
-const mapMode = ref<'real' | 'diagram'>(props.compact ? 'diagram' : 'real')
+const mapMode = ref<'real' | 'satellite' | 'diagram'>(props.compact ? 'diagram' : 'real')
 const activeSampleIndex = ref(0)
 const zoomLevel = ref(1)
 const pan = ref({ x: 0, y: 0 })
@@ -16,7 +16,9 @@ const isDragging = ref(false)
 const activeTrack = computed(() => tracks.find((item) => item.id === props.track) ?? tracks[0])
 const clipId = computed(() => `track-map-clip-${activeTrack.value.id}`)
 const profileSamples = computed(() => activeTrack.value.profile.samples)
-const showRealMap = computed(() => !props.compact && mapMode.value === 'real')
+const showSatelliteMap = computed(() => !props.compact && (mapMode.value === 'real' || mapMode.value === 'satellite'))
+const showTrackOverlay = computed(() => props.compact || mapMode.value !== 'satellite')
+const showMapSamples = computed(() => !props.compact && mapMode.value !== 'satellite')
 const mapFrame = { width: 380, height: 250 }
 const minZoom = 1
 const maxZoom = 4
@@ -93,7 +95,7 @@ const elevationLabel = computed(() => {
 })
 
 const mapTransform = computed(() => {
-  if (!showRealMap.value) return 'translate(0 0) scale(1)'
+  if (!showSatelliteMap.value) return 'translate(0 0) scale(1)'
   return `translate(${pan.value.x.toFixed(2)} ${pan.value.y.toFixed(2)}) scale(${zoomLevel.value.toFixed(3)})`
 })
 
@@ -112,7 +114,7 @@ function svgPointFromEvent(event: MouseEvent) {
 }
 
 function mapPointFromSvgPoint(point: DOMPoint) {
-  if (!showRealMap.value) return point
+  if (!showSatelliteMap.value) return point
   return {
     x: (point.x - pan.value.x) / zoomLevel.value,
     y: (point.y - pan.value.y) / zoomLevel.value
@@ -160,7 +162,7 @@ function resetMapView() {
 }
 
 function selectNearestMapSample(event: MouseEvent) {
-  if (props.compact || !profileSamples.value.length) return
+  if (props.compact || mapMode.value === 'satellite' || !profileSamples.value.length) return
   const point = svgPointFromEvent(event)
   if (!point) return
   const mapPoint = mapPointFromSvgPoint(point)
@@ -180,7 +182,7 @@ function selectNearestMapSample(event: MouseEvent) {
 
 function handleMapPointerDown(event: PointerEvent) {
   if (props.compact) return
-  if (!showRealMap.value) {
+  if (!showSatelliteMap.value) {
     selectNearestMapSample(event)
     return
   }
@@ -200,7 +202,7 @@ function handleMapPointerDown(event: PointerEvent) {
 function handleMapPointerMove(event: PointerEvent) {
   if (props.compact) return
 
-  if (dragStart.value && showRealMap.value) {
+  if (dragStart.value && showSatelliteMap.value) {
     const svg = event.currentTarget as SVGSVGElement
     const rect = svg.getBoundingClientRect()
     const dx = ((event.clientX - dragStart.value.clientX) * mapFrame.width) / rect.width
@@ -229,7 +231,7 @@ function handleMapPointerEnd(event: PointerEvent) {
 }
 
 function handleMapWheel(event: WheelEvent) {
-  if (props.compact || !showRealMap.value) return
+  if (props.compact || !showSatelliteMap.value) return
   const point = svgPointFromEvent(event)
   if (!point) return
   applyZoom(zoomLevel.value * (event.deltaY < 0 ? 1.18 : 1 / 1.18), point)
@@ -257,14 +259,15 @@ function selectNearestProfileSample(event: MouseEvent) {
 </script>
 
 <template>
-  <div class="track-map" :class="{ 'track-map--compact': compact, 'track-map--real': showRealMap }">
+  <div class="track-map" :class="{ 'track-map--compact': compact, 'track-map--real': showSatelliteMap }">
     <div class="track-map__canvas">
       <div v-if="!compact" class="track-map__mode" role="group" aria-label="地图模式">
         <button type="button" :class="{ active: mapMode === 'real' }" @click="mapMode = 'real'">真实赛道</button>
+        <button type="button" :class="{ active: mapMode === 'satellite' }" @click="mapMode = 'satellite'">纯卫星</button>
         <button type="button" :class="{ active: mapMode === 'diagram' }" @click="mapMode = 'diagram'">轮廓图</button>
       </div>
 
-      <div v-if="showRealMap" class="track-map__zoom-controls" role="group" aria-label="地图缩放">
+      <div v-if="showSatelliteMap" class="track-map__zoom-controls" role="group" aria-label="地图缩放">
         <button type="button" aria-label="放大地图" @click="zoomIn">+</button>
         <button type="button" aria-label="缩小地图" @click="zoomOut">-</button>
         <button type="button" aria-label="重置地图视图" @click="resetMapView">{{ Math.round(zoomLevel * 100) }}%</button>
@@ -290,7 +293,7 @@ function selectNearestProfileSample(event: MouseEvent) {
 
         <g :clip-path="`url(#${clipId})`">
           <g class="track-map__viewport" :transform="mapTransform">
-            <g v-if="showRealMap" class="track-map__satellite">
+            <g v-if="showSatelliteMap" class="track-map__satellite">
               <image
                 v-for="tile in activeTrack.satellite.tiles"
                 :key="tile.url"
@@ -304,12 +307,12 @@ function selectNearestProfileSample(event: MouseEvent) {
               <rect class="track-map__satellite-wash" width="380" height="250" />
             </g>
 
-            <path class="track-map__shadow" :d="activeTrack.path" />
-            <path class="track-map__accent" :d="activeTrack.path" />
-            <path class="track-map__line" :d="activeTrack.path" />
-            <path v-if="!compact" class="track-map__hit-path" :d="activeTrack.path" />
+            <path v-if="showTrackOverlay" class="track-map__shadow" :d="activeTrack.path" />
+            <path v-if="showTrackOverlay" class="track-map__accent" :d="activeTrack.path" />
+            <path v-if="showTrackOverlay" class="track-map__line" :d="activeTrack.path" />
+            <path v-if="!compact && showTrackOverlay" class="track-map__hit-path" :d="activeTrack.path" />
 
-            <g v-if="!compact">
+            <g v-if="showMapSamples">
               <circle
                 v-for="(sample, index) in profileSamples"
                 :key="`${activeTrack.id}-${index}`"
@@ -334,7 +337,7 @@ function selectNearestProfileSample(event: MouseEvent) {
         </g>
       </svg>
 
-      <div v-if="showRealMap" class="track-map__attribution">
+      <div v-if="showSatelliteMap" class="track-map__attribution">
         {{ activeTrack.satellite.attribution }}
       </div>
     </div>

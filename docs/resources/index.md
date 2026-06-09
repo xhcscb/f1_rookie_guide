@@ -1,15 +1,20 @@
 # 资源导航
 
-这里整理适合继续学习的外部资源。第一版只做入口和筛选标准，不抓取内容、不复制付费或受版权保护的资料。
+这里整理适合继续学习的外部资源。本页只做导航和使用说明，不抓取内容，不复制付费或受版权保护的资料。涉及规则、赛历、车队和车手名单时，优先回到 FIA 与 Formula 1 官方来源核对。
 
 <div class="card-grid two">
-  <ConceptCard title="官方资料" desc="赛历、规则、官方术语和赛事信息，以原始来源为准。" link="/resources/official" />
-  <ConceptCard title="数据网站" desc="用于赛后复盘和基础图表理解，不作为本站实时数据源。" link="/resources/data-sites" />
-  <ConceptCard title="英文内容" desc="解释型频道、新闻分析和赛事复盘，适合进阶阅读。" link="/resources/creators" />
-  <ConceptCard title="中文内容" desc="先给出筛选标准和待补充清单，避免随意推荐低质量内容。" link="/resources/chinese" />
+  <ConceptCard title="官方资料" desc="赛历、规则、官方术语、车队车手名单和比赛结果。适合做最终核对，不适合只看二手转述。" link="/resources/official" />
+  <ConceptCard title="数据网站" desc="圈速、stint、进站、轮胎衰退和位置变化。适合赛后复盘，也适合开发者练习数据分析。" link="/resources/data-sites" />
+  <ConceptCard title="英文内容" desc="解释型视频、新闻分析和赛后复盘。适合想理解规则、技术和策略细节的读者。" link="/resources/creators" />
+  <ConceptCard title="中文内容" desc="中文观赛入口、中文检索方式和内容筛选标准。适合想低门槛追赛的新手。" link="/resources/chinese" />
 </div>
+
+## 怎么用这份导航
+
+1. 先用官方资料核对事实：赛历、规则、处罚、车队和车手名单都可能变化。
+2. 再用解释型内容理解原因：例如为什么要 undercut，为什么轮胎会掉速。
+3. 最后用数据站点复盘：看圈速、轮胎、交通和安全车窗口是否支持你的判断。
 
 ## 筛选原则
 
-优先选择长期更新、清楚引用来源、区分事实与观点、不会过度情绪化输出的资源。涉及规则、处罚、赛历和技术细节时，应尽量回到 FIA 或 Formula 1 官方来源核对。
-
+优先选择长期更新、清楚引用来源、区分事实与观点、不靠情绪化表达制造流量的资源。涉及规则、处罚、赛历和技术细节时，应尽量回到 FIA 或 Formula 1 官方来源核对。

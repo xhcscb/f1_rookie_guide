@@ -1388,4 +1388,17 @@ a.term-badge:hover {
   .track-corner-card__top {
     display: block;
   }
+
+  .track-map__mode {
+    top: 48px;
+    right: auto;
+    left: 10px;
+  }
+
+  .track-map__mode button,
+  .track-map__zoom-controls button {
+    min-height: 24px;
+    padding: 0 7px;
+    font-size: 0.72rem;
+  }
 }
